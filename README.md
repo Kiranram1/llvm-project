@@ -92,10 +92,5 @@ main,0x7ffe5678
 
 ---
 
-## 👨‍💻 Author  
-- **Kiran H R**  
-
----
-
 ## 📜 License  
 This project is licensed for **educational and research purposes only**.  
