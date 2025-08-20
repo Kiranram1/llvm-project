@@ -1,44 +1,101 @@
-# The LLVM Compiler Infrastructure
+# 🧩 PointerTracker – LLVM Pass for Memory Access Tracing  
 
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/llvm/llvm-project/badge)](https://securityscorecards.dev/viewer/?uri=github.com/llvm/llvm-project)
-[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/8273/badge)](https://www.bestpractices.dev/projects/8273)
-[![libc++](https://github.com/llvm/llvm-project/actions/workflows/libcxx-build-and-test.yaml/badge.svg?branch=main&event=schedule)](https://github.com/llvm/llvm-project/actions/workflows/libcxx-build-and-test.yaml?query=event%3Aschedule)
+![LLVM](https://img.shields.io/badge/LLVM-14+-blue?logo=llvm)  
+![C++](https://img.shields.io/badge/C++-17-orange?logo=cplusplus)  
+![Clang](https://img.shields.io/badge/Clang-Compiler-lightgrey?logo=clang)  
+![License](https://img.shields.io/badge/License-Educational-green)  
 
-Welcome to the LLVM project!
+---
 
-This repository contains the source code for LLVM, a toolkit for the
-construction of highly optimized compilers, optimizers, and run-time
-environments.
+## 📌 Overview  
+**PointerTracker** is a custom **LLVM Function Pass** that instruments programs to monitor memory accesses at runtime.  
+For each function, it logs the function name and records the **hexadecimal addresses** of every memory read and write.  
+The results are output in **CSV format**, making analysis simple and structured.  
 
-The LLVM project has multiple components. The core of the project is
-itself called "LLVM". This contains all of the tools, libraries, and header
-files needed to process intermediate representations and convert them into
-object files. Tools include an assembler, disassembler, bitcode analyzer, and
-bitcode optimizer.
+This project is important because it enables:  
+- 🔍 **Debugging** → Identify memory access patterns causing segmentation faults or memory leaks.  
+- 🔐 **Security Analysis** → Detect suspicious memory behavior that could indicate vulnerabilities.  
+- ⚡ **Performance Profiling** → Study memory locality and optimize cache performance.  
+- 📖 **Program Comprehension** → Gain deeper insights into how compiled programs actually interact with memory.  
 
-C-like languages use the [Clang](https://clang.llvm.org/) frontend. This
-component compiles C, C++, Objective-C, and Objective-C++ code into LLVM bitcode
--- and from there into object files, using LLVM.
+---
 
-Other components include:
-the [libc++ C++ standard library](https://libcxx.llvm.org),
-the [LLD linker](https://lld.llvm.org), and more.
+## 🚀 Features  
+- LLVM-based **automatic instrumentation** (no source code modification needed).  
+- Runtime logging of pointer addresses for every function.  
+- **CSV output** for easy visualization and analysis.  
+- Lightweight and compiler-integrated, suitable for research and educational use.  
 
-## Getting the Source Code and Building LLVM
+---
 
-Consult the
-[Getting Started with LLVM](https://llvm.org/docs/GettingStarted.html#getting-the-source-code-and-building-llvm)
-page for information on building and running LLVM.
+## 🛠️ Requirements  
+- **LLVM 14+**  
+- **Clang**  
+- **CMake**  
+- **Ninja (optional)**  
 
-For information on how to contribute to the LLVM project, please take a look at
-the [Contributing to LLVM](https://llvm.org/docs/Contributing.html) guide.
+---
 
-## Getting in touch
+## ⚙️ Usage  
 
-Join the [LLVM Discourse forums](https://discourse.llvm.org/), [Discord
-chat](https://discord.gg/xS7Z362),
-[LLVM Office Hours](https://llvm.org/docs/GettingInvolved.html#office-hours) or
-[Regular sync-ups](https://llvm.org/docs/GettingInvolved.html#online-sync-ups).
+### 1. Compile C to LLVM IR  
+```bash
+clang -Xclang -disable-O0-optnone -S -emit-llvm test.c -o test.ll
+```
 
-The LLVM project has adopted a [code of conduct](https://llvm.org/docs/CodeOfConduct.html) for
-participants to all modes of communication within the project.
+### 2. Run the PointerTracker Pass  
+```bash
+opt -load-pass-plugin ./PointerTracker.so -passes="function(pointer-tracker)" test.ll -o instrumented.ll
+```
+
+### 3. Compile Instrumented IR  
+```bash
+clang instrumented.ll -o test_exec
+```
+
+### 4. Run Executable  
+```bash
+./test_exec
+```
+
+---
+
+## 📊 Example Output  
+
+Input C code:  
+```c
+#include <stdio.h>
+void foo() {
+    int x = 10;
+    int *p = &x;
+    printf("%p\n", (void*)p);
+}
+int main() {
+    foo();
+    return 0;
+}
+```
+
+CSV Output:  
+```
+foo,0x7ffe1234
+main,0x7ffe5678
+```
+
+---
+
+## 🔮 Future Enhancements  
+- Add support for **multi-threaded logging**.  
+- Extend to **loop-level and module-level analysis**.  
+- Provide **real-time visualization** of memory access.  
+- Export results in multiple formats (JSON, XML).  
+
+---
+
+## 👨‍💻 Author  
+- **Kiran H R**  
+
+---
+
+## 📜 License  
+This project is licensed for **educational and research purposes only**.  
